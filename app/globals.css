@@ -1,0 +1,399 @@
+@import "tailwindcss";
+
+
+:root {
+
+  --background:
+    #050510;
+
+  --foreground:
+    #ffffff;
+
+  --primary:
+    #7c3aed;
+
+  --secondary:
+    #06b6d4;
+
+  --glass:
+    rgba(255,255,255,0.08);
+
+}
+
+
+* {
+
+  margin:
+    0;
+
+  padding:
+    0;
+
+  box-sizing:
+    border-box;
+
+}
+
+
+html {
+
+  scroll-behavior:
+    smooth;
+
+}
+
+
+body {
+
+  background:
+    var(--background);
+
+  color:
+    var(--foreground);
+
+  min-height:
+    100vh;
+
+  overflow-x:
+    hidden;
+
+  font-family:
+    Arial,
+    sans-serif;
+
+}
+
+
+
+/* Scrollbar */
+
+::-webkit-scrollbar {
+
+  width:
+    10px;
+
+}
+
+
+::-webkit-scrollbar-track {
+
+  background:
+    #050510;
+
+}
+
+
+::-webkit-scrollbar-thumb {
+
+  background:
+    linear-gradient(
+      #7c3aed,
+      #06b6d4
+    );
+
+  border-radius:
+    999px;
+
+}
+
+
+
+/* Selection */
+
+::selection {
+
+  background:
+    #7c3aed;
+
+  color:
+    white;
+
+}
+
+
+
+/* Glass Effect */
+
+.glass {
+
+  background:
+    rgba(
+      255,
+      255,
+      255,
+      0.08
+    );
+
+  backdrop-filter:
+    blur(20px);
+
+  -webkit-backdrop-filter:
+    blur(20px);
+
+  border:
+    1px solid
+    rgba(
+      255,
+      255,
+      255,
+      0.12
+    );
+
+}
+
+
+
+/* Glow Effects */
+
+.glow-purple {
+
+  box-shadow:
+
+    0 0 40px
+    rgba(
+      124,
+      58,
+      237,
+      0.45
+    );
+
+}
+
+
+.glow-cyan {
+
+  box-shadow:
+
+    0 0 40px
+    rgba(
+      6,
+      182,
+      212,
+      0.45
+    );
+
+}
+
+
+
+/* Gradient Text */
+
+.gradient-text {
+
+  background:
+
+    linear-gradient(
+      90deg,
+      #7c3aed,
+      #06b6d4
+    );
+
+  background-clip:
+    text;
+
+  -webkit-background-clip:
+    text;
+
+  color:
+    transparent;
+
+}
+
+
+
+/* Galaxy Background */
+
+.galaxy-bg {
+
+  background:
+
+    radial-gradient(
+      circle at top,
+      rgba(
+        124,
+        58,
+        237,
+        0.35
+      ),
+      transparent 40%
+    ),
+
+    radial-gradient(
+      circle at bottom,
+      rgba(
+        6,
+        182,
+        212,
+        0.25
+      ),
+      transparent 40%
+    ),
+
+    #050510;
+
+}
+
+
+
+/* Floating Animation */
+
+@keyframes float {
+
+  0% {
+
+    transform:
+      translateY(0);
+
+  }
+
+
+  50% {
+
+    transform:
+      translateY(-15px);
+
+  }
+
+
+  100% {
+
+    transform:
+      translateY(0);
+
+  }
+
+}
+
+
+
+.animate-float {
+
+  animation:
+
+    float
+    5s
+    ease-in-out
+    infinite;
+
+}
+
+
+
+/* Fade Animation */
+
+@keyframes fadeUp {
+
+  from {
+
+    opacity:
+      0;
+
+    transform:
+      translateY(30px);
+
+  }
+
+
+  to {
+
+    opacity:
+      1;
+
+    transform:
+      translateY(0);
+
+  }
+
+}
+
+
+
+.animate-fade-up {
+
+  animation:
+
+    fadeUp
+    .8s
+    ease
+    forwards;
+
+}
+
+
+
+/* Button Base */
+
+.btn-primary {
+
+  background:
+
+    linear-gradient(
+      90deg,
+      #7c3aed,
+      #06b6d4
+    );
+
+  color:
+    white;
+
+  padding:
+    14px 30px;
+
+  border-radius:
+    18px;
+
+  transition:
+    .3s;
+
+}
+
+
+
+.btn-primary:hover {
+
+  transform:
+    translateY(-3px);
+
+  filter:
+    brightness(1.2);
+
+}
+
+
+
+/* Remove link default */
+
+a {
+
+  color:
+    inherit;
+
+  text-decoration:
+    none;
+
+}
+
+
+
+/* Images */
+
+img {
+
+  max-width:
+    100%;
+
+  height:
+    auto;
+
+}
+
+
+
+/* 3D Canvas */
+
+canvas {
+
+  touch-action:
+    none;
+
+    }
