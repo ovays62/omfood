@@ -2,56 +2,89 @@
 
 import { motion } from "framer-motion";
 
-export default function GalaxyBackground() {
-  const stars = Array.from({ length: 80 });
+export default function GalaxyBackground(){
 
-  return (
-    <div className="fixed inset-0 -z-10 overflow-hidden galaxy-bg">
+const stars = Array.from({length:120});
 
-      {stars.map((_, i) => (
-        <motion.div
-          key={i}
-          className="absolute w-1 h-1 bg-white rounded-full"
-          initial={{
-            opacity:0.2,
-            x: Math.random()*window.innerWidth,
-            y: Math.random()*window.innerHeight
-          }}
-          animate={{
-            opacity:[0.2,1,0.2]
-          }}
-          transition={{
-            duration:2+Math.random()*3,
-            repeat:Infinity
-          }}
-        />
-      ))}
+return (
 
+<div className="
+fixed
+inset-0
+-z-10
+overflow-hidden
+bg-[#050510]
+">
 
-      <div className="
-        absolute
-        top-[-200px]
-        left-1/2
-        -translate-x-1/2
-        w-[500px]
-        h-[500px]
-        rounded-full
-        bg-purple-600/30
-        blur-[150px]
-      "/>
+{/* Purple Nebula */}
+<div className="
+absolute
+top-[-200px]
+left-1/2
+-translate-x-1/2
+w-[600px]
+h-[600px]
+bg-purple-600/30
+blur-[180px]
+rounded-full
+"/>
 
 
-      <div className="
-        absolute
-        bottom-[-200px]
-        right-[-100px]
-        w-[500px]
-        h-[500px]
-        rounded-full
-        bg-cyan-500/20
-        blur-[150px]
-      "/>
+{/* Cyan Nebula */}
+<div className="
+absolute
+bottom-[-200px]
+right-[-150px]
+w-[500px]
+h-[500px]
+bg-cyan-500/20
+blur-[160px]
+rounded-full
+"/>
 
-    </div>
-  );
+
+
+{/* Stars */}
+
+{
+stars.map((_,i)=>(
+
+<motion.div
+
+key={i}
+
+className="
+absolute
+w-[2px]
+h-[2px]
+bg-white
+rounded-full
+"
+
+initial={{
+opacity:0.2,
+x:Math.random()*1200,
+y:Math.random()*900
+}}
+
+animate={{
+opacity:[0.2,1,0.2]
+}}
+
+transition={{
+duration:
+2+Math.random()*4,
+repeat:Infinity
+}}
+
+/>
+
+))
+}
+
+
+</div>
+
+)
+
 }
