@@ -9,7 +9,6 @@ import IngredientPanel from "../../components/IngredientPanel";
 import PricePanel from "../../components/PricePanel";
 import OrderSummary from "../../components/OrderSummary";
 
-
 export default function BuilderPage(){
 
 
