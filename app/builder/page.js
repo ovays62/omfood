@@ -1,169 +1,40 @@
-"use client";
+import FoodCanvas from "@/components/builder/FoodCanvas";
 
 
-import { useState } from "react";
-
-
-import FoodViewer3D from "../../components/FoodViewer3D";
-import IngredientPanel from "../../components/IngredientPanel";
-import PricePanel from "../../components/PricePanel";
-import OrderSummary from "../../components/OrderSummary";
-
-export default function BuilderPage(){
-
-
-
-const [ingredients,setIngredients] = useState([]);
-
-
-
-
+export default function Builder(){
 
 return (
 
-
 <main
-
 className="
 min-h-screen
-galaxy-bg
-px-6
 pt-32
-pb-20
+px-5
+galaxy-bg
 "
-
->
-
-
-<div
-
-className="
-max-w-7xl
-mx-auto
-"
-
 >
 
 
 <h1
-
 className="
-text-6xl
+text-5xl
 font-black
+gradient-text
 text-center
-mb-16
+mb-10
 "
-
 >
 
-
-Food Builder
-
+ساخت غذای من 🍕
 
 </h1>
 
 
-
-
-
-
-<div
-
-className="
-grid
-lg:grid-cols-2
-gap-10
-"
-
->
-
-
-
-
-
-{/* 3D Viewer */}
-
-
-
-<div>
-
-
-<FoodViewer3D
-
-ingredients={ingredients}
-
-/>
-
-
-</div>
-
-
-
-
-
-
-
-{/* Controls */}
-
-
-
-<div
-
-className="
-space-y-8
-"
-
->
-
-
-<IngredientPanel
-
-selected={ingredients}
-
-setSelected={setIngredients}
-
-/>
-
-
-
-
-
-<PricePanel
-
-ingredients={ingredients}
-
-/>
-
-
-
-
-
-<OrderSummary
-
-ingredients={ingredients}
-
-/>
-
-
-
-</div>
-
-
-
-
-
-</div>
-
-
-
-</div>
-
+<FoodCanvas/>
 
 
 </main>
 
+)
 
-);
-
-
-             }
+}
