@@ -1,0 +1,51 @@
+CREATE TABLE users (
+
+id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+name TEXT NOT NULL,
+
+email TEXT UNIQUE NOT NULL,
+
+password TEXT NOT NULL,
+
+created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+
+);
+
+
+
+CREATE TABLE foods (
+
+id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+name TEXT NOT NULL,
+
+category TEXT,
+
+image TEXT,
+
+price INTEGER,
+
+rating REAL,
+
+description TEXT
+
+);
+
+
+
+CREATE TABLE orders (
+
+id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+user_id INTEGER,
+
+items TEXT,
+
+total INTEGER,
+
+status TEXT DEFAULT 'pending',
+
+created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+
+);
