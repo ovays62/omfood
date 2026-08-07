@@ -1,681 +1,714 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 
-const INGREDIENTS = [
-  { id: "cheese", name: "پنیر", emoji: "🧀", price: 35000 },
-  { id: "mushroom", name: "قارچ", emoji: "🍄", price: 25000 },
-  { id: "pepper", name: "فلفل", emoji: "🌶️", price: 15000 },
-  { id: "olive", name: "زیتون", emoji: "🫒", price: 20000 },
-  { id: "tomato", name: "گوجه", emoji: "🍅", price: 18000 },
-  { id: "corn", name: "ذرت", emoji: "🌽", price: 22000 },
-];
+const INGREDIENTS = {
+  cheese: {
+    name: "پنیر",
+    emoji: "🧀",
+  },
+  mushroom: {
+    name: "قارچ",
+    emoji: "🍄",
+  },
+  olive: {
+    name: "زیتون",
+    emoji: "🫒",
+  },
+  pepper: {
+    name: "فلفل",
+    emoji: "🌶️",
+  },
+  tomato: {
+    name: "گوجه",
+    emoji: "🍅",
+  },
+  pepperoni: {
+    name: "پپرونی",
+    emoji: "🍕",
+  },
+  chicken: {
+    name: "مرغ",
+    emoji: "🍗",
+  },
+  beef: {
+    name: "گوشت",
+    emoji: "🥩",
+  },
+};
 
-export default function FoodCanvas() {
+export default function FoodCanvas({
+  base = "pizza",
+  selectedIngredients = [],
+  onIngredientAdd,
+}) {
   const canvasRef = useRef(null);
+  const containerRef = useRef(null);
 
-  const [foodType, setFoodType] = useState("pizza");
-  const [selectedIngredients, setSelectedIngredients] = useState([]);
-  const [hoveredIngredient, setHoveredIngredient] = useState(null);
+  const [isDrawing, setIsDrawing] = useState(false);
+  const [ingredientMode, setIngredientMode] = useState(null);
+  const [particles, setParticles] = useState([]);
 
-  const basePrices = {
-    pizza: 149000,
-    burger: 139000,
-    sandwich: 119000,
+  const getCanvas = () => {
+    const canvas = canvasRef.current;
+
+    if (!canvas) return null;
+
+    return canvas;
   };
 
-  const basePrice = basePrices[foodType];
+  const resizeCanvas = () => {
+    const canvas = canvasRef.current;
+    const container = containerRef.current;
 
-  const ingredientsPrice = selectedIngredients.reduce(
-    (total, id) => {
-      const ingredient = INGREDIENTS.find((item) => item.id === id);
-      return total + (ingredient?.price || 0);
-    },
-    0
-  );
+    if (!canvas || !container) return;
 
-  const finalPrice = basePrice + ingredientsPrice;
+    const rect = container.getBoundingClientRect();
 
-  const toggleIngredient = (ingredient) => {
-    setSelectedIngredients((current) => {
-      if (current.includes(ingredient.id)) {
-        return current.filter((id) => id !== ingredient.id);
-      }
+    const dpr = window.devicePixelRatio || 1;
 
-      return [...current, ingredient.id];
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+
+    canvas.style.width = `${rect.width}px`;
+    canvas.style.height = `${rect.height}px`;
+
+    const ctx = canvas.getContext("2d");
+
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    drawFood();
+  };
+
+  const drawFood = () => {
+    const canvas = canvasRef.current;
+    const container = containerRef.current;
+
+    if (!canvas || !container) return;
+
+    const rect = container.getBoundingClientRect();
+
+    const width = rect.width;
+    const height = rect.height;
+
+    const ctx = canvas.getContext("2d");
+
+    ctx.clearRect(0, 0, width, height);
+
+    /*
+     * Background glow
+     */
+    const glow = ctx.createRadialGradient(
+      width / 2,
+      height / 2,
+      20,
+      width / 2,
+      height / 2,
+      Math.min(width, height) * 0.45
+    );
+
+    glow.addColorStop(0, "rgba(168,85,247,.16)");
+    glow.addColorStop(0.5, "rgba(59,130,246,.07)");
+    glow.addColorStop(1, "rgba(0,0,0,0)");
+
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, 0, width, height);
+
+    /*
+     * Food size
+     */
+    const size = Math.min(width, height) * 0.62;
+
+    const centerX = width / 2;
+    const centerY = height / 2;
+
+    /*
+     * Shadow
+     */
+    ctx.save();
+
+    ctx.beginPath();
+
+    ctx.ellipse(
+      centerX,
+      centerY + size * 0.37,
+      size * 0.38,
+      size * 0.09,
+      0,
+      0,
+      Math.PI * 2
+    );
+
+    ctx.fillStyle = "rgba(0,0,0,.5)";
+    ctx.filter = "blur(18px)";
+    ctx.fill();
+
+    ctx.restore();
+
+    /*
+     * Base food
+     */
+    if (base === "pizza") {
+      drawPizzaBase(ctx, centerX, centerY, size);
+    }
+
+    if (base === "burger") {
+      drawBurgerBase(ctx, centerX, centerY, size);
+    }
+
+    if (base === "sandwich") {
+      drawSandwichBase(ctx, centerX, centerY, size);
+    }
+
+    /*
+     * Ingredients
+     */
+    selectedIngredients.forEach((ingredient, index) => {
+      drawIngredient(
+        ctx,
+        ingredient,
+        centerX,
+        centerY,
+        size,
+        index
+      );
     });
   };
 
-  useEffect(() => {
+  const drawPizzaBase = (ctx, x, y, size) => {
+    const radius = size * 0.38;
+
+    /*
+     * Outer crust
+     */
+    ctx.save();
+
+    const crust = ctx.createRadialGradient(
+      x - radius * 0.2,
+      y - radius * 0.2,
+      radius * 0.1,
+      x,
+      y,
+      radius
+    );
+
+    crust.addColorStop(0, "#ffd27a");
+    crust.addColorStop(0.55, "#d9822b");
+    crust.addColorStop(1, "#7a3519");
+
+    ctx.beginPath();
+    ctx.arc(x, y, radius, 0, Math.PI * 2);
+
+    ctx.fillStyle = crust;
+    ctx.shadowColor = "rgba(255,150,50,.25)";
+    ctx.shadowBlur = 35;
+    ctx.fill();
+
+    ctx.restore();
+
+    /*
+     * Cheese
+     */
+    ctx.save();
+
+    const cheese = ctx.createRadialGradient(
+      x - radius * 0.2,
+      y - radius * 0.25,
+      0,
+      x,
+      y,
+      radius
+    );
+
+    cheese.addColorStop(0, "#fff4ad");
+    cheese.addColorStop(0.65, "#ffd84d");
+    cheese.addColorStop(1, "#e5a72d");
+
+    ctx.beginPath();
+    ctx.arc(x, y, radius * 0.89, 0, Math.PI * 2);
+
+    ctx.fillStyle = cheese;
+    ctx.fill();
+
+    ctx.restore();
+
+    /*
+     * Cheese highlights
+     */
+    ctx.save();
+
+    ctx.globalAlpha = 0.25;
+
+    for (let i = 0; i < 20; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const distance = Math.random() * radius * 0.7;
+
+      const px = x + Math.cos(angle) * distance;
+      const py = y + Math.sin(angle) * distance;
+
+      ctx.beginPath();
+      ctx.arc(px, py, 2, 0, Math.PI * 2);
+
+      ctx.fillStyle = "#fff";
+      ctx.fill();
+    }
+
+    ctx.restore();
+  };
+
+  const drawBurgerBase = (ctx, x, y, size) => {
+    const width = size * 0.7;
+    const height = size * 0.18;
+
+    /*
+     * Bottom bun
+     */
+    ctx.save();
+
+    ctx.beginPath();
+
+    ctx.roundRect(
+      x - width / 2,
+      y + size * 0.14,
+      width,
+      height,
+      40
+    );
+
+    const bottom = ctx.createLinearGradient(
+      0,
+      y,
+      0,
+      y + height
+    );
+
+    bottom.addColorStop(0, "#d98a35");
+    bottom.addColorStop(1, "#7d3919");
+
+    ctx.fillStyle = bottom;
+    ctx.fill();
+
+    ctx.restore();
+
+    /*
+     * Meat
+     */
+    ctx.save();
+
+    ctx.beginPath();
+
+    ctx.roundRect(
+      x - width / 2,
+      y - size * 0.02,
+      width,
+      height,
+      30
+    );
+
+    const meat = ctx.createLinearGradient(
+      0,
+      y,
+      0,
+      y + height
+    );
+
+    meat.addColorStop(0, "#8b3a20");
+    meat.addColorStop(1, "#42170d");
+
+    ctx.fillStyle = meat;
+    ctx.fill();
+
+    ctx.restore();
+
+    /*
+     * Cheese
+     */
+    ctx.save();
+
+    ctx.beginPath();
+
+    ctx.moveTo(x - width * 0.46, y - size * 0.04);
+    ctx.lineTo(x + width * 0.46, y - size * 0.04);
+    ctx.lineTo(x + width * 0.4, y + size * 0.06);
+    ctx.lineTo(x - width * 0.4, y + size * 0.06);
+    ctx.closePath();
+
+    ctx.fillStyle = "#ffd84d";
+    ctx.fill();
+
+    ctx.restore();
+
+    /*
+     * Lettuce
+     */
+    ctx.save();
+
+    ctx.beginPath();
+
+    for (let i = 0; i <= 12; i++) {
+      const px =
+        x - width / 2 + (width / 12) * i;
+
+      const py =
+        y - size * 0.08 +
+        Math.sin(i * 1.7) * 5;
+
+      if (i === 0) {
+        ctx.moveTo(px, py);
+      } else {
+        ctx.lineTo(px, py);
+      }
+    }
+
+    ctx.strokeStyle = "#54b947";
+    ctx.lineWidth = 12;
+    ctx.lineCap = "round";
+    ctx.stroke();
+
+    ctx.restore();
+
+    /*
+     * Top bun
+     */
+    ctx.save();
+
+    ctx.beginPath();
+
+    ctx.ellipse(
+      x,
+      y - size * 0.16,
+      width * 0.52,
+      height * 1.4,
+      0,
+      Math.PI,
+      Math.PI * 2
+    );
+
+    const top = ctx.createRadialGradient(
+      x - width * 0.15,
+      y - size * 0.25,
+      0,
+      x,
+      y - size * 0.18,
+      width
+    );
+
+    top.addColorStop(0, "#ffd98b");
+    top.addColorStop(0.6, "#dc8c3c");
+    top.addColorStop(1, "#8b421e");
+
+    ctx.fillStyle = top;
+    ctx.fill();
+
+    ctx.restore();
+
+    /*
+     * Sesame
+     */
+    ctx.save();
+
+    ctx.fillStyle = "#fff1bc";
+
+    for (let i = 0; i < 16; i++) {
+      const angle = Math.random() * Math.PI;
+      const px =
+        x + Math.cos(angle) * width * 0.38;
+
+      const py =
+        y - size * 0.23 +
+        Math.random() * size * 0.07;
+
+      ctx.save();
+      ctx.translate(px, py);
+      ctx.rotate(Math.random());
+      ctx.fillRect(-3, -1, 6, 2);
+      ctx.restore();
+    }
+
+    ctx.restore();
+  };
+
+  const drawSandwichBase = (ctx, x, y, size) => {
+    const width = size * 0.78;
+    const height = size * 0.28;
+
+    ctx.save();
+
+    /*
+     * Bread
+     */
+    const bread = ctx.createLinearGradient(
+      x,
+      y - height,
+      x,
+      y + height
+    );
+
+    bread.addColorStop(0, "#ffd98b");
+    bread.addColorStop(0.55, "#d99543");
+    bread.addColorStop(1, "#7c3d1d");
+
+    ctx.beginPath();
+
+    ctx.roundRect(
+      x - width / 2,
+      y - height / 2,
+      width,
+      height,
+      40
+    );
+
+    ctx.fillStyle = bread;
+
+    ctx.shadowColor = "rgba(255,150,50,.25)";
+    ctx.shadowBlur = 30;
+
+    ctx.fill();
+
+    ctx.restore();
+
+    /*
+     * Filling
+     */
+    ctx.save();
+
+    ctx.beginPath();
+
+    ctx.roundRect(
+      x - width * 0.43,
+      y - height * 0.08,
+      width * 0.86,
+      height * 0.45,
+      15
+    );
+
+    ctx.fillStyle = "#5b2817";
+    ctx.fill();
+
+    ctx.restore();
+
+    /*
+     * Lettuce
+     */
+    ctx.save();
+
+    ctx.strokeStyle = "#59b94a";
+    ctx.lineWidth = 14;
+    ctx.lineCap = "round";
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+      x - width * 0.4,
+      y - height * 0.01
+    );
+
+    ctx.quadraticCurveTo(
+      x - width * 0.15,
+      y + height * 0.1,
+      x,
+      y
+    );
+
+    ctx.quadraticCurveTo(
+      x + width * 0.2,
+      y - height * 0.08,
+      x + width * 0.4,
+      y
+    );
+
+    ctx.stroke();
+
+    ctx.restore();
+  };
+
+  const drawIngredient = (
+    ctx,
+    ingredient,
+    centerX,
+    centerY,
+    size,
+    index
+  ) => {
+    if (!ingredient) return;
+
+    const key =
+      typeof ingredient === "string"
+        ? ingredient
+        : ingredient.id;
+
+    const data = INGREDIENTS[key];
+
+    if (!data) return;
+
+    const angle =
+      (index * 137.5 * Math.PI) / 180;
+
+    const distance =
+      size * (0.08 + (index % 4) * 0.07);
+
+    const x =
+      centerX +
+      Math.cos(angle) * distance;
+
+    const y =
+      centerY +
+      Math.sin(angle) * distance;
+
+    ctx.save();
+
+    ctx.font = `${Math.max(22, size * 0.075)}px Arial`;
+
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+
+    ctx.shadowColor = "rgba(0,0,0,.45)";
+    ctx.shadowBlur = 8;
+
+    ctx.fillText(
+      data.emoji,
+      x,
+      y
+    );
+
+    ctx.restore();
+  };
+
+  const getPointerPosition = (event) => {
     const canvas = canvasRef.current;
+
+    if (!canvas) return null;
+
+    const rect = canvas.getBoundingClientRect();
+
+    const clientX =
+      event.touches?.[0]?.clientX ??
+      event.clientX;
+
+    const clientY =
+      event.touches?.[0]?.clientY ??
+      event.clientY;
+
+    return {
+      x: clientX - rect.left,
+      y: clientY - rect.top,
+    };
+  };
+
+  const drawBrush = (x, y) => {
+    const canvas = getCanvas();
 
     if (!canvas) return;
 
     const ctx = canvas.getContext("2d");
 
-    const resizeCanvas = () => {
-      const rect = canvas.getBoundingClientRect();
+    ctx.save();
 
-      const dpr = window.devicePixelRatio || 1;
+    ctx.beginPath();
 
-      canvas.width = rect.width * dpr;
-      canvas.height = rect.height * dpr;
-
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-      drawFood();
-    };
-
-    const drawFood = () => {
-      const rect = canvas.getBoundingClientRect();
-
-      const width = rect.width;
-      const height = rect.height;
-
-      ctx.clearRect(0, 0, width, height);
-
-      const centerX = width / 2;
-      const centerY = height / 2;
-
-      /*
-       * Ambient glow
-       */
-
-      const glow = ctx.createRadialGradient(
-        centerX,
-        centerY,
-        20,
-        centerX,
-        centerY,
-        230
-      );
-
-      glow.addColorStop(0, "rgba(139,92,246,.25)");
-      glow.addColorStop(0.5, "rgba(59,130,246,.10)");
-      glow.addColorStop(1, "rgba(0,0,0,0)");
-
-      ctx.fillStyle = glow;
-
-      ctx.beginPath();
-      ctx.arc(centerX, centerY, 230, 0, Math.PI * 2);
-
-      ctx.fill();
-
-      /*
-       * Food plate shadow
-       */
-
-      ctx.save();
-
-      ctx.fillStyle = "rgba(0,0,0,.35)";
-      ctx.filter = "blur(25px)";
-
-      ctx.beginPath();
-
-      ctx.ellipse(
-        centerX,
-        centerY + 125,
-        145,
-        38,
-        0,
-        0,
-        Math.PI * 2
-      );
-
-      ctx.fill();
-
-      ctx.restore();
-
-      /*
-       * Plate
-       */
-
-      const plateGradient = ctx.createRadialGradient(
-        centerX,
-        centerY,
-        20,
-        centerX,
-        centerY,
-        190
-      );
-
-      plateGradient.addColorStop(0, "#ffffff");
-      plateGradient.addColorStop(0.8, "#d9d9df");
-      plateGradient.addColorStop(1, "#8b8b96");
-
-      ctx.fillStyle = plateGradient;
-
-      ctx.beginPath();
-
-      ctx.ellipse(
-        centerX,
-        centerY + 35,
-        185,
-        65,
-        0,
-        0,
-        Math.PI * 2
-      );
-
-      ctx.fill();
-
-      /*
-       * Food
-       */
-
-      if (foodType === "pizza") {
-        drawPizza(ctx, centerX, centerY);
-      }
-
-      if (foodType === "burger") {
-        drawBurger(ctx, centerX, centerY);
-      }
-
-      if (foodType === "sandwich") {
-        drawSandwich(ctx, centerX, centerY);
-      }
-
-      /*
-       * Ingredient decorations
-       */
-
-      selectedIngredients.forEach((id, index) => {
-        const ingredient = INGREDIENTS.find(
-          (item) => item.id === id
-        );
-
-        if (!ingredient) return;
-
-        const angle =
-          (Math.PI * 2 * index) /
-          Math.max(selectedIngredients.length, 1);
-
-        const radius = 65;
-
-        const x =
-          centerX +
-          Math.cos(angle) * radius;
-
-        const y =
-          centerY +
-          Math.sin(angle) * radius;
-
-        ctx.save();
-
-        ctx.font = "30px Arial";
-
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-
-        ctx.shadowColor = "rgba(0,0,0,.4)";
-        ctx.shadowBlur = 8;
-
-        ctx.fillText(
-          ingredient.emoji,
-          x,
-          y
-        );
-
-        ctx.restore();
-      });
-    };
-
-    const drawPizza = (
-      ctx,
-      x,
-      y
-    ) => {
-      const radius = 125;
-
-      /*
-       * Pizza shadow
-       */
-
-      ctx.save();
-
-      ctx.fillStyle = "rgba(0,0,0,.3)";
-      ctx.filter = "blur(10px)";
-
-      ctx.beginPath();
-
-      ctx.arc(
-        x,
-        y + 12,
-        radius,
-        0,
-        Math.PI * 2
-      );
-
-      ctx.fill();
-
-      ctx.restore();
-
-      /*
-       * Crust
-       */
-
-      const crust = ctx.createRadialGradient(
-        x - 30,
-        y - 30,
-        20,
-        x,
-        y,
-        radius
-      );
-
-      crust.addColorStop(0, "#ffd27a");
-      crust.addColorStop(0.7, "#d8892b");
-      crust.addColorStop(1, "#8d4b18");
-
-      ctx.fillStyle = crust;
-
-      ctx.beginPath();
-
-      ctx.arc(
-        x,
-        y,
-        radius,
-        0,
-        Math.PI * 2
-      );
-
-      ctx.fill();
-
-      /*
-       * Sauce
-       */
-
-      ctx.fillStyle = "#b82e22";
-
-      ctx.beginPath();
-
-      ctx.arc(
-        x,
-        y,
-        radius - 14,
-        0,
-        Math.PI * 2
-      );
-
-      ctx.fill();
-
-      /*
-       * Cheese
-       */
-
-      const cheese = ctx.createRadialGradient(
-        x - 30,
-        y - 30,
-        10,
-        x,
-        y,
-        radius
-      );
-
-      cheese.addColorStop(0, "#fff2a8");
-      cheese.addColorStop(0.8, "#ffc94f");
-      cheese.addColorStop(1, "#e69a21");
-
-      ctx.fillStyle = cheese;
-
-      ctx.beginPath();
-
-      ctx.arc(
-        x,
-        y,
-        radius - 24,
-        0,
-        Math.PI * 2
-      );
-
-      ctx.fill();
-
-      /*
-       * Pepperoni
-       */
-
-      const pepperonis = [
-        [-45, -35],
-        [45, -45],
-        [55, 30],
-        [-55, 40],
-        [0, 55],
-      ];
-
-      pepperonis.forEach(([dx, dy]) => {
-        ctx.fillStyle = "#b52d22";
-
-        ctx.beginPath();
-
-        ctx.arc(
-          x + dx,
-          y + dy,
-          16,
-          0,
-          Math.PI * 2
-        );
-
-        ctx.fill();
-
-        ctx.fillStyle = "#e84a2e";
-
-        ctx.beginPath();
-
-        ctx.arc(
-          x + dx - 4,
-          y + dy - 4,
-          5,
-          0,
-          Math.PI * 2
-        );
-
-        ctx.fill();
-      });
-    };
-
-    const drawBurger = (
-      ctx,
-      x,
-      y
-    ) => {
-      /*
-       * Burger shadow
-       */
-
-      ctx.save();
-
-      ctx.fillStyle = "rgba(0,0,0,.35)";
-      ctx.filter = "blur(15px)";
-
-      ctx.beginPath();
-
-      ctx.ellipse(
-        x,
-        y + 110,
-        125,
-        25,
-        0,
-        0,
-        Math.PI * 2
-      );
-
-      ctx.fill();
-
-      ctx.restore();
-
-      /*
-       * Bottom bun
-       */
-
-      const bun = ctx.createLinearGradient(
-        x,
-        y - 80,
-        x,
-        y + 100
-      );
-
-      bun.addColorStop(0, "#ffd27a");
-      bun.addColorStop(1, "#a95b1d");
-
-      ctx.fillStyle = bun;
-
-      roundRect(
-        ctx,
-        x - 125,
-        y + 55,
-        250,
-        55,
-        25
-      );
-
-      ctx.fill();
-
-      /*
-       * Patty
-       */
-
-      ctx.fillStyle = "#542b1a";
-
-      roundRect(
-        ctx,
-        x - 120,
-        y + 15,
-        240,
-        48,
-        15
-      );
-
-      ctx.fill();
-
-      /*
-       * Cheese
-       */
-
-      ctx.fillStyle = "#ffca3a";
-
-      ctx.beginPath();
-
-      ctx.moveTo(x - 115, y + 10);
-      ctx.lineTo(x + 115, y + 10);
-      ctx.lineTo(x + 85, y + 38);
-      ctx.lineTo(x + 45, y + 22);
-      ctx.lineTo(x, y + 40);
-      ctx.lineTo(x - 55, y + 22);
-      ctx.lineTo(x - 90, y + 38);
-      ctx.closePath();
-
-      ctx.fill();
-
-      /*
-       * Lettuce
-       */
-
-      ctx.fillStyle = "#45a83d";
-
-      roundRect(
-        ctx,
-        x - 120,
-        y - 5,
-        240,
-        28,
-        10
-      );
-
-      ctx.fill();
-
-      /*
-       * Top bun
-       */
-
-      const topBun = ctx.createRadialGradient(
-        x - 40,
-        y - 65,
-        10,
-        x,
-        y - 30,
-        130
-      );
-
-      topBun.addColorStop(0, "#ffe09b");
-      topBun.addColorStop(0.7, "#e99a37");
-      topBun.addColorStop(1, "#a95b1d");
-
-      ctx.fillStyle = topBun;
-
-      ctx.beginPath();
-
-      ctx.ellipse(
-        x,
-        y - 48,
-        125,
-        65,
-        0,
-        Math.PI,
-        Math.PI * 2
-      );
-
-      ctx.fill();
-
-      /*
-       * Sesame
-       */
-
-      const seeds = [
-        [-55, -70],
-        [-20, -85],
-        [20, -82],
-        [55, -65],
-        [0, -65],
-      ];
-
-      ctx.fillStyle = "#fff0b5";
-
-      seeds.forEach(([dx, dy]) => {
-        ctx.beginPath();
-
-        ctx.ellipse(
-          x + dx,
-          y + dy,
-          7,
-          3,
-          -0.3,
-          0,
-          Math.PI * 2
-        );
-
-        ctx.fill();
-      });
-    };
-
-    const drawSandwich = (
-      ctx,
-      x,
-      y
-    ) => {
-      ctx.save();
-
-      ctx.translate(x, y);
-      ctx.rotate(-0.08);
-
-      /*
-       * Bread
-       */
-
-      const bread = ctx.createLinearGradient(
-        0,
-        -100,
-        0,
-        100
-      );
-
-      bread.addColorStop(0, "#ffe0a3");
-      bread.addColorStop(1, "#b86b25");
-
-      ctx.fillStyle = bread;
-
-      roundRect(
-        ctx,
-        -135,
-        -90,
-        270,
-        75,
-        25
-      );
-
-      ctx.fill();
-
-      /*
-       * Meat
-       */
-
-      ctx.fillStyle = "#713b28";
-
-      roundRect(
-        ctx,
-        -130,
-        -20,
-        260,
-        42,
-        12
-      );
-
-      ctx.fill();
-
-      /*
-       * Cheese
-       */
-
-      ctx.fillStyle = "#ffc93c";
-
-      ctx.beginPath();
-
-      ctx.moveTo(-125, -20);
-      ctx.lineTo(125, -20);
-      ctx.lineTo(95, 15);
-      ctx.lineTo(40, -2);
-      ctx.lineTo(-20, 18);
-      ctx.lineTo(-75, -2);
-      ctx.closePath();
-
-      ctx.fill();
-
-      /*
-       * Lettuce
-       */
-
-      ctx.fillStyle = "#43a047";
-
-      roundRect(
-        ctx,
-        -130,
-        15,
-        260,
-        25,
-        8
-      );
-
-      ctx.fill();
-
-      /*
-       * Bottom bread
-       */
-
-      ctx.fillStyle = "#d38a36";
-
-      roundRect(
-        ctx,
-        -135,
-        38,
-        270,
-        65,
-        20
-      );
-
-      ctx.fill();
-
-      ctx.restore();
-    };
-
-    const roundRect = (
-      ctx,
+    ctx.arc(
       x,
       y,
-      width,
-      height,
-      radius
-    ) => {
-      ctx.beginPath();
+      14,
+      0,
+      Math.PI * 2
+    );
 
-      ctx.roundRect(
-        x,
-        y,
-        width,
-        height,
-        radius
+    ctx.fillStyle =
+      "rgba(168,85,247,.18)";
+
+    ctx.shadowColor =
+      "rgba(168,85,247,.8)";
+
+    ctx.shadowBlur = 20;
+
+    ctx.fill();
+
+    ctx.restore();
+  };
+
+  const handlePointerDown = (event) => {
+    const position =
+      getPointerPosition(event);
+
+    if (!position) return;
+
+    setIsDrawing(true);
+
+    if (ingredientMode) {
+      addIngredientAtPosition(
+        position.x,
+        position.y
       );
+
+      return;
+    }
+
+    drawBrush(
+      position.x,
+      position.y
+    );
+  };
+
+  const handlePointerMove = (event) => {
+    if (!isDrawing) return;
+
+    const position =
+      getPointerPosition(event);
+
+    if (!position) return;
+
+    if (!ingredientMode) {
+      drawBrush(
+        position.x,
+        position.y
+      );
+    }
+  };
+
+  const handlePointerUp = () => {
+    setIsDrawing(false);
+  };
+
+  const addIngredientAtPosition = (
+    x,
+    y
+  ) => {
+    if (!ingredientMode) return;
+
+    const newParticle = {
+      id:
+        Date.now() +
+        Math.random(),
+
+      ingredient:
+        ingredientMode,
+
+      x,
+      y,
     };
 
+    setParticles((current) => [
+      ...current,
+      newParticle,
+    ]);
+
+    if (onIngredientAdd) {
+      onIngredientAdd(
+        ingredientMode
+      );
+    }
+  };
+
+  const clearCanvas = () => {
+    setParticles([]);
+    setIngredientMode(null);
+
+    drawFood();
+  };
+
+  useEffect(() => {
     resizeCanvas();
 
     window.addEventListener(
@@ -689,295 +722,207 @@ export default function FoodCanvas() {
         resizeCanvas
       );
     };
+  }, []);
+
+  useEffect(() => {
+    drawFood();
   }, [
-    foodType,
+    base,
     selectedIngredients,
+    particles,
   ]);
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#07070c] px-4 py-8 text-white">
+    <div
+      ref={containerRef}
+      className="
+        relative
+        min-h-[560px]
+        w-full
+        overflow-hidden
+        rounded-[2rem]
+        border
+        border-white/10
+        bg-black/20
+        backdrop-blur-2xl
+      "
+    >
 
-      {/* Background */}
-      <div className="pointer-events-none absolute inset-0">
+      {/* Header */}
+      <div className="absolute left-5 right-5 top-5 z-20 flex items-center justify-between">
 
-        <div className="absolute left-1/2 top-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-purple-600/10 blur-[150px]" />
+        <div>
+          <div className="text-xs font-bold tracking-[0.2em] text-white/30">
+            OMFOOD
+          </div>
 
-        <div className="absolute bottom-0 right-0 h-[400px] w-[400px] rounded-full bg-blue-600/10 blur-[130px]" />
+          <div className="mt-1 text-sm font-bold text-white/80">
+            Food Canvas
+          </div>
+        </div>
+
+        <button
+          onClick={clearCanvas}
+          className="
+            rounded-xl
+            border
+            border-white/10
+            bg-black/20
+            px-4
+            py-2
+            text-xs
+            text-white/50
+            backdrop-blur-xl
+            transition
+            hover:bg-white/10
+            hover:text-white
+          "
+        >
+          پاک کردن
+        </button>
 
       </div>
 
-      <div className="relative z-10 mx-auto max-w-7xl">
+      {/* Canvas */}
+      <canvas
+        ref={canvasRef}
+        className="
+          absolute
+          inset-0
+          h-full
+          w-full
+          touch-none
+          cursor-crosshair
+        "
+        onMouseDown={handlePointerDown}
+        onMouseMove={handlePointerMove}
+        onMouseUp={handlePointerUp}
+        onMouseLeave={handlePointerUp}
+        onTouchStart={handlePointerDown}
+        onTouchMove={handlePointerMove}
+        onTouchEnd={handlePointerUp}
+      />
 
-        {/* Header */}
+      {/* Placed ingredients */}
+      <AnimateParticles
+        particles={particles}
+      />
 
-        <div className="mb-8">
+      {/* Ingredient tools */}
+      <div className="absolute bottom-5 left-1/2 z-20 w-[calc(100%-2rem)] max-w-xl -translate-x-1/2">
 
-          <motion.h1
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-3xl font-black sm:text-5xl"
-          >
-            غذای خودت را بساز
-          </motion.h1>
+        <div className="
+          flex
+          items-center
+          gap-2
+          overflow-x-auto
+          rounded-2xl
+          border
+          border-white/10
+          bg-black/40
+          p-2
+          backdrop-blur-2xl
+        ">
 
-          <p className="mt-3 text-white/50">
-            هر چیزی که دوست داری انتخاب کن.
-          </p>
-
-        </div>
-
-        {/* Food Type */}
-
-        <div className="mb-6 grid grid-cols-3 gap-3">
-
-          {[
-            ["pizza", "🍕", "پیتزا"],
-            ["burger", "🍔", "برگر"],
-            ["sandwich", "🥪", "ساندویچ"],
-          ].map(([id, emoji, name]) => (
-            <motion.button
-              key={id}
-              whileTap={{ scale: 0.96 }}
-              onClick={() => setFoodType(id)}
-              className={`rounded-2xl border p-4 transition ${
-                foodType === id
-                  ? "border-purple-400/50 bg-purple-500/20 shadow-[0_0_30px_rgba(139,92,246,.15)]"
-                  : "border-white/10 bg-white/[.04] hover:bg-white/[.08]"
-              }`}
-            >
-              <div className="text-3xl">
-                {emoji}
-              </div>
-
-              <div className="mt-2 text-sm font-bold">
-                {name}
-              </div>
-
-            </motion.button>
-          ))}
-
-        </div>
-
-        {/* Main Builder */}
-
-        <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
-
-          {/* Canvas */}
-
-          <motion.div
-            initial={{ opacity: 0, scale: 0.97 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="relative overflow-hidden rounded-[32px] border border-white/10 bg-white/[.035] backdrop-blur-xl"
-          >
-
-            <div className="absolute left-5 top-5 z-10 rounded-full border border-white/10 bg-black/30 px-4 py-2 text-xs text-white/50 backdrop-blur-xl">
-              Live Preview
-            </div>
-
-            <canvas
-              ref={canvasRef}
-              className="h-[480px] w-full"
-            />
-
-            {/* Bottom Info */}
-
-            <div className="absolute bottom-5 left-5 right-5 flex items-center justify-between rounded-2xl border border-white/10 bg-black/30 px-5 py-4 backdrop-blur-xl">
-
-              <div>
-                <div className="text-xs text-white/40">
-                  غذای انتخابی
-                </div>
-
-                <div className="mt-1 font-bold">
-                  {foodType === "pizza"
-                    ? "پیتزا"
-                    : foodType === "burger"
-                    ? "برگر"
-                    : "ساندویچ"}
-                </div>
-              </div>
-
-              <div className="text-left">
-                <div className="text-xs text-white/40">
-                  قیمت نهایی
-                </div>
-
-                <motion.div
-                  key={finalPrice}
-                  initial={{
-                    scale: 1.2,
-                    opacity: 0,
-                  }}
-                  animate={{
-                    scale: 1,
-                    opacity: 1,
-                  }}
-                  className="mt-1 text-xl font-black text-purple-300"
-                >
-                  {finalPrice.toLocaleString("fa-IR")} تومان
-                </motion.div>
-              </div>
-
-            </div>
-
-          </motion.div>
-
-          {/* Ingredients */}
-
-          <div className="rounded-[32px] border border-white/10 bg-white/[.035] p-5 backdrop-blur-xl">
-
-            <div className="mb-5">
-
-              <h2 className="text-xl font-black">
-                مواد اولیه
-              </h2>
-
-              <p className="mt-1 text-sm text-white/40">
-                مواد مورد علاقه‌ات را اضافه کن
-              </p>
-
-            </div>
-
-            <div className="space-y-3">
-
-              {INGREDIENTS.map((ingredient) => {
-                const selected =
-                  selectedIngredients.includes(
-                    ingredient.id
+          {Object.entries(INGREDIENTS).map(
+            ([id, item]) => (
+              <motion.button
+                key={id}
+                whileTap={{
+                  scale: 0.9,
+                }}
+                onClick={() => {
+                  setIngredientMode(
+                    current =>
+                      current === id
+                        ? null
+                        : id
                   );
-
-                return (
-                  <motion.button
-                    key={ingredient.id}
-                    whileHover={{
-                      scale: 1.02,
-                      x: -3,
-                    }}
-                    whileTap={{
-                      scale: 0.97,
-                    }}
-                    onClick={() =>
-                      toggleIngredient(
-                        ingredient
-                      )
-                    }
-                    onMouseEnter={() =>
-                      setHoveredIngredient(
-                        ingredient.id
-                      )
-                    }
-                    onMouseLeave={() =>
-                      setHoveredIngredient(null)
-                    }
-                    className={`relative flex w-full items-center justify-between rounded-2xl border p-4 text-right transition ${
-                      selected
-                        ? "border-purple-400/40 bg-purple-500/15"
-                        : "border-white/10 bg-white/[.025] hover:bg-white/[.06]"
-                    }`}
-                  >
-
-                    <div className="flex items-center gap-3">
-
-                      <div className="text-3xl">
-                        {ingredient.emoji}
-                      </div>
-
-                      <div>
-
-                        <div className="font-bold">
-                          {ingredient.name}
-                        </div>
-
-                        <div className="mt-1 text-xs text-white/40">
-                          +
-                          {ingredient.price.toLocaleString(
-                            "fa-IR"
-                          )}
-                          تومان
-                        </div>
-
-                      </div>
-
-                    </div>
-
-                    <div
-                      className={`flex h-7 w-7 items-center justify-center rounded-full border transition ${
-                        selected
-                          ? "border-purple-400 bg-purple-500"
-                          : "border-white/20"
-                      }`}
-                    >
-                      {selected && "✓"}
-                    </div>
-
-                    <AnimatePresence>
-                      {hoveredIngredient ===
-                        ingredient.id && (
-                        <motion.div
-                          initial={{
-                            opacity: 0,
-                            scale: 0.9,
-                          }}
-                          animate={{
-                            opacity: 1,
-                            scale: 1,
-                          }}
-                          exit={{
-                            opacity: 0,
-                            scale: 0.9,
-                          }}
-                          className="absolute -top-10 right-2 rounded-lg bg-black/80 px-3 py-1 text-xs text-white/70"
-                        >
-                          اضافه کردن {ingredient.name}
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-
-                  </motion.button>
-                );
-              })}
-
-            </div>
-
-            {/* Summary */}
-
-            <div className="mt-6 border-t border-white/10 pt-5">
-
-              <div className="flex items-center justify-between text-sm text-white/50">
-                <span>قیمت پایه</span>
+                }}
+                className={`
+                  flex
+                  shrink-0
+                  items-center
+                  gap-2
+                  rounded-xl
+                  px-3
+                  py-2
+                  text-xs
+                  transition
+                  ${
+                    ingredientMode === id
+                      ? "bg-purple-500/30 text-white ring-1 ring-purple-400/50"
+                      : "bg-white/5 text-white/50 hover:bg-white/10"
+                  }
+                `}
+              >
+                <span className="text-lg">
+                  {item.emoji}
+                </span>
 
                 <span>
-                  {basePrice.toLocaleString(
-                    "fa-IR"
-                  )}{" "}
-                  تومان
+                  {item.name}
                 </span>
-              </div>
+              </motion.button>
+            )
+          )}
 
-              <div className="mt-3 flex items-center justify-between text-sm text-white/50">
-                <span>افزودنی‌ها</span>
+        </div>
 
-                <span>
-                  {ingredientsPrice.toLocaleString(
-                    "fa-IR"
-                  )}{" "}
-                  تومان
-                </span>
-              </div>
+        <div className="mt-2 text-center text-[10px] text-white/25">
+          یک ماده را انتخاب کن و روی غذا ضربه بزن
+        </div>
 
-              <div className="mt-5 flex items-end justify-between">
+      </div>
 
-                <span className="font-bold">
-                  مجموع
-                </span>
+    </div>
+  );
+}
 
-                <span className="text-2xl font-black text-purple-300">
-                  {finalPrice.toLocaleString(
-                    "fa-IR"
-                  )}{" "}
-                  تومان
-                </span>
+function AnimateParticles({
+  particles,
+}) {
+  return (
+    <div className="pointer-events-none absolute inset-0 z-10">
 
-              </div>
+      {particles.map((particle) => {
+        const ingredient =
+          INGREDIENTS[
+            particle.ingredient
+          ];
 
-              <motio
+        if (!ingredient) return null;
+
+        return (
+          <motion.div
+            key={particle.id}
+            initial={{
+              opacity: 0,
+              scale: 0,
+              rotate: -30,
+            }}
+            animate={{
+              opacity: 1,
+              scale: 1,
+              rotate: 0,
+            }}
+            className="
+              absolute
+              -translate-x-1/2
+              -translate-y-1/2
+              text-3xl
+              drop-shadow-[0_8px_10px_rgba(0,0,0,.5)]
+            "
+            style={{
+              left: particle.x,
+              top: particle.y,
+            }}
+          >
+            {ingredient.emoji}
+          </motion.div>
+        );
+      })}
+
+    </div>
+  );
+}
