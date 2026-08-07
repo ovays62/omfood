@@ -1,257 +1,216 @@
 "use client";
 
 
-import { motion } from "framer-motion";
-import { Star, ShoppingCart } from "lucide-react";
+import {motion} from "framer-motion";
+import {
+ Star,
+ ShoppingCart
+} from "lucide-react";
 
 
 
-export default function FoodCard({food}){
+export default function FoodCard({
 
+food
 
-  return (
+}){
 
-    <motion.div
 
+return (
 
-      whileHover={{
 
-        y:-10,
-        scale:1.03
+<motion.div
 
-      }}
 
+whileHover={{
 
-      transition={{
+y:-10,
 
-        duration:.3
+scale:1.03
 
-      }}
+}}
 
 
-      className="
-      glass
-      rounded-3xl
-      overflow-hidden
-      border
-      border-white/10
-      "
+className="
+glass
+rounded-3xl
+overflow-hidden
+"
 
-    >
 
+>
 
 
 
-      {/* Image Area */}
+<div
 
+className="
+h-64
+overflow-hidden
+"
 
-      <div
+>
 
-        className="
-        h-64
-        flex
-        items-center
-        justify-center
-        bg-gradient-to-br
-        from-violet-600/20
-        to-cyan-500/20
-        "
 
-      >
+<img
 
+src={food.image}
 
-        <div
+alt={food.name}
 
-          className="
-          text-8xl
-          animate-float
-          "
+className="
+w-full
+h-full
+object-cover
+hover:scale-110
+transition
+duration-500
+"
 
-        >
+/>
 
-          {food.icon || "🍕"}
 
-        </div>
+</div>
 
 
 
-      </div>
 
+<div
 
+className="
+p-6
+"
 
+>
 
 
+<div
 
-      {/* Content */}
+className="
+flex
+justify-between
+"
 
+>
 
-      <div
 
-        className="
-        p-6
-        "
+<h3
 
-      >
+className="
+text-2xl
+font-bold
+"
 
+>
 
+{food.name}
 
-        <div
+</h3>
 
-          className="
-          flex
-          justify-between
-          items-center
-          "
 
-        >
 
+<div
 
+className="
+flex
+gap-1
+text-yellow-400
+"
 
-          <h3
+>
 
-            className="
-            text-2xl
-            font-bold
-            "
+<Star
+size={18}
+fill="currentColor"
+/>
 
-          >
 
-            {food.name}
+{food.rating}
 
 
-          </h3>
+</div>
 
 
 
+</div>
 
-          <div
 
-            className="
-            flex
-            items-center
-            gap-1
-            text-yellow-400
-            "
 
-          >
 
-            <Star
+<p
 
-              size={18}
+className="
+text-gray-400
+mt-4
+"
 
-              fill="currentColor"
+>
 
-            />
+{food.description}
 
+</p>
 
-            <span>
 
-              {food.rating || "5.0"}
 
-            </span>
 
+<div
 
-          </div>
+className="
+flex
+justify-between
+items-center
+mt-6
+"
 
+>
 
 
-        </div>
+<span
 
+className="
+gradient-text
+font-black
+text-xl
+"
 
+>
 
+{food.price.toLocaleString()}
 
+ تومان
 
-        <p
+</span>
 
-          className="
-          text-gray-400
-          mt-4
-          leading-7
-          "
 
-        >
 
-          {food.description}
+<button
 
+className="
+btn-primary
+flex
+gap-2
+items-center
+"
 
-        </p>
+>
 
+<ShoppingCart size={18}/>
 
+سفارش
 
+</button>
 
 
+</div>
 
-        <div
 
-          className="
-          flex
-          items-center
-          justify-between
-          mt-8
-          "
+</div>
 
-        >
 
+</motion.div>
 
 
+);
 
-          <span
-
-            className="
-            text-xl
-            font-black
-            gradient-text
-            "
-
-          >
-
-            {food.price || "250,000"} تومان
-
-          </span>
-
-
-
-
-
-          <button
-
-            className="
-            flex
-            items-center
-            gap-2
-            px-5
-            py-3
-            rounded-xl
-            bg-violet-600/30
-            border
-            border-violet-400/30
-            hover:bg-violet-600/50
-            transition
-            "
-
-          >
-
-            <ShoppingCart size={20}/>
-
-
-            سفارش
-
-
-          </button>
-
-
-
-        </div>
-
-
-
-      </div>
-
-
-
-    </motion.div>
-
-
-  );
 
 }
