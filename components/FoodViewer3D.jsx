@@ -12,12 +12,16 @@ Environment
 } from "@react-three/drei";
 
 
-import RealFoodModel from "./RealFoodModel";
+import FoodModel3D from "./FoodModel3D";
 
 
 
 
-export default function FoodViewer3D(){
+export default function FoodViewer3D({
+
+ingredients=[]
+
+}){
 
 
 
@@ -36,23 +40,17 @@ overflow-hidden
 >
 
 
+
 <Canvas
 
 camera={{
 
-position:[
-
-0,
-
-2,
-
-5
-
-]
+position:[0,2,5]
 
 }}
 
 >
+
 
 
 <ambientLight
@@ -63,26 +61,12 @@ intensity={1.5}
 
 
 
-<directionalLight
 
-position={[
-
-5,
-
-5,
-
-5
-
-]}
-
-/>
-
-
-
-
-<RealFoodModel
+<FoodModel3D
 
 model="/models/pizza.glb"
+
+ingredients={ingredients}
 
 />
 
@@ -94,11 +78,7 @@ model="/models/pizza.glb"
 
 enableZoom
 
-enablePan
-
 />
-
-
 
 
 
