@@ -1,14 +1,24 @@
 "use client";
 
-import { motion } from "framer-motion";
+import {motion} from "framer-motion";
+
 
 export default function Navbar(){
 
 return (
 
 <motion.nav
-initial={{y:-50,opacity:0}}
-animate={{y:0,opacity:1}}
+
+initial={{
+opacity:0,
+y:-40
+}}
+
+animate={{
+opacity:1,
+y:0
+}}
+
 className="
 fixed
 top-5
@@ -21,10 +31,13 @@ rounded-3xl
 px-6
 py-4
 flex
-justify-between
 items-center
+justify-between
 z-50
-">
+"
+
+>
+
 
 <h1 className="
 text-3xl
@@ -35,6 +48,7 @@ OmFood
 </h1>
 
 
+
 <div className="
 hidden
 md:flex
@@ -42,16 +56,15 @@ gap-8
 text-white/80
 ">
 
-<a>خانه</a>
-<a>منو</a>
-<a>سازنده غذا</a>
-<a>AI Chef</a>
+<span>خانه</span>
+<span>منو</span>
+<span>سازنده غذا</span>
+<span>AI Chef</span>
 
 </div>
 
 
-<button
-className="
+<button className="
 btn-primary
 ">
 ورود
