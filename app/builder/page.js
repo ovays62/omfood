@@ -4,14 +4,10 @@
 import { useState } from "react";
 
 
-import FoodViewer3D from "@/components/FoodViewer3D";
-
-import IngredientPanel from "@/components/IngredientPanel";
-
-import PricePanel from "@/components/PricePanel";
-
-import OrderSummary from "@/components/OrderSummary";
-
+import FoodViewer3D from "../../components/FoodViewer3D";
+import IngredientPanel from "../../components/IngredientPanel";
+import PricePanel from "../../components/PricePanel";
+import OrderSummary from "../../components/OrderSummary";
 
 
 export default function BuilderPage(){
