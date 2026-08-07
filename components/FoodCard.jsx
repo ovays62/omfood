@@ -4,12 +4,11 @@ import { motion } from "framer-motion";
 
 
 export default function FoodCard({
-  title,
-  description,
-  image,
-  price,
-  onClick
+  food
 }) {
+
+
+  if (!food) return null;
 
 
   return (
@@ -17,12 +16,12 @@ export default function FoodCard({
     <motion.div
 
       whileHover={{
-        y:-8,
-        scale:1.03
+        y: -8,
+        scale: 1.03
       }}
 
       whileTap={{
-        scale:.95
+        scale: 0.95
       }}
 
       className="
@@ -35,8 +34,6 @@ export default function FoodCard({
       text-white
       cursor-pointer
       "
-      
-      onClick={onClick}
 
     >
 
@@ -50,9 +47,9 @@ export default function FoodCard({
 
         <img
 
-          src={image}
+          src={food.image}
 
-          alt={title}
+          alt={food.name}
 
           className="
           w-full
@@ -78,26 +75,33 @@ export default function FoodCard({
 
 
         <h3
+
           className="
           text-2xl
           font-bold
           mb-2
           "
+
         >
-          {title}
+
+          {food.name}
+
         </h3>
 
 
 
+
         <p
+
           className="
           text-gray-300
           text-sm
           mb-4
           "
+
         >
 
-          {description}
+          {food.description}
 
         </p>
 
@@ -105,29 +109,36 @@ export default function FoodCard({
 
 
         <div
+
           className="
           flex
           justify-between
           items-center
           "
+
         >
 
+
           <span
+
             className="
             text-yellow-300
             font-bold
             text-lg
             "
+
           >
 
-            {
-              price.toLocaleString()
-            }
+            {food.price?.toLocaleString() ?? "0"}
 
             {" "}
+
             تومان
 
+
           </span>
+
+
 
 
 
@@ -138,9 +149,10 @@ export default function FoodCard({
             py-2
             rounded-xl
             bg-purple-600
+            hover:bg-purple-700
             font-bold
             "
-            
+
           >
 
             انتخاب
@@ -148,7 +160,17 @@ export default function FoodCard({
           </button>
 
 
+
         </div>
+
+
+
+        <div className="mt-3 text-sm text-yellow-200">
+
+          ⭐ {food.rating}
+
+        </div>
+
 
 
       </div>
@@ -159,4 +181,3 @@ export default function FoodCard({
   );
 
 }
- 
