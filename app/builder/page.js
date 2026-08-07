@@ -93,7 +93,11 @@ gap-10
 <div>
 
 
-<FoodViewer3D/>
+<FoodViewer3D
+
+ingredients={ingredients}
+
+/>
 
 
 </div>
