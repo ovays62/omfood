@@ -1,13 +1,10 @@
 "use client";
 
-
 import { useState } from "react";
 
 import FoodCard from "../../components/FoodCard";
-
-import SearchBar from "@/components/SearchBar";
-
-import FilterPanel from "@/components/FilterPanel";
+import SearchBar from "../../components/SearchBar";
+import FilterPanel from "../../components/FilterPanel";
 
 import { foods } from "@/lib/foods";
 
