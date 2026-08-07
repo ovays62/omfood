@@ -1,84 +1,161 @@
 "use client";
 
+import { motion } from "framer-motion";
 
 
 export default function PricePanel({
-
-ingredients=[]
-
-}){
-
-
-  const basePrice =
-    150000;
+  ingredients = [],
+  basePrice = 80000
+}) {
 
 
-
-  const total =
-
-    basePrice +
-
+  const ingredientsPrice =
     ingredients.reduce(
-
-      (sum,item)=>
-
-        sum + item.price,
-
+      (total, item) =>
+        total + item.price,
       0
-
     );
 
+
+  const finalPrice =
+    basePrice + ingredientsPrice;
 
 
 
   return (
 
-    <div
+    <motion.div
+
+      initial={{
+        opacity:0,
+        y:20
+      }}
+
+      animate={{
+        opacity:1,
+        y:0
+      }}
 
       className="
-      glass
+      w-full
+      p-5
       rounded-3xl
-      p-6
+      bg-gradient-to-br
+      from-purple-500/20
+      to-blue-500/20
+      backdrop-blur-xl
+      border
+      border-white/20
+      text-white
       "
 
     >
 
-      <h3
-
+      <h2
         className="
         text-xl
         font-bold
+        mb-4
         "
-
       >
-
-        قیمت نهایی
-
-      </h3>
+        💰 قیمت سفارش
+      </h2>
 
 
 
-      <p
-
+      <div
         className="
-        text-4xl
-        font-black
-        gradient-text
-        mt-4
+        flex
+        justify-between
+        mb-3
         "
-
       >
 
-        {total.toLocaleString()}
+        <span>
+          قیمت پایه
+        </span>
 
-        تومان
+        <span>
+          {
+            basePrice.toLocaleString()
+          }
+          {" "}
+          تومان
+        </span>
 
-      </p>
+      </div>
 
 
-    </div>
 
+      <div
+        className="
+        flex
+        justify-between
+        mb-3
+        "
+      >
+
+        <span>
+          مواد انتخابی
+        </span>
+
+        <span>
+          {
+            ingredientsPrice.toLocaleString()
+          }
+          {" "}
+          تومان
+        </span>
+
+      </div>
+
+
+
+      <div
+        className="
+        h-px
+        bg-white/20
+        my-4
+        "
+      />
+
+
+
+      <div
+        className="
+        flex
+        justify-between
+        text-2xl
+        font-bold
+        "
+      >
+
+        <span>
+          مجموع
+        </span>
+
+
+        <span
+          className="
+          text-yellow-300
+          "
+        >
+
+          {
+            finalPrice.toLocaleString()
+          }
+
+          {" "}
+          تومان
+
+        </span>
+
+
+      </div>
+
+
+
+    </motion.div>
 
   );
-
 }
