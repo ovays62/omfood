@@ -1,0 +1,15 @@
+name = "omfood-api"
+
+main = "index.js"
+
+compatibility_date = "2026-08-07"
+
+
+
+[[d1_databases]]
+
+binding = "DB"
+
+database_name = "omfood-db"
+
+database_id = "YOUR_DATABASE_ID"
