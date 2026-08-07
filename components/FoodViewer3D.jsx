@@ -15,6 +15,9 @@ Environment
 import FoodModel3D from "./FoodModel3D";
 
 
+import FoodParticles from "./FoodParticles";
+
+import CameraAnimation from "./CameraAnimation";
 
 
 export default function FoodViewer3D({
@@ -88,6 +91,9 @@ preset="city"
 
 />
 
+  <FoodParticles/>
+
+<CameraAnimation/>
 
 
 </Canvas>
