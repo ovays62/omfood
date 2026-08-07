@@ -2,11 +2,11 @@
   "name": "omfood",
   "version": "1.0.0",
   "private": true,
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start"
-  },
+"scripts": {
+  "dev": "next dev",
+  "build": "next build",
+  "start": "next start"
+}
   "dependencies": {
     "@react-three/drei": "9.122.0",
     "@react-three/fiber": "8.17.10",
