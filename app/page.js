@@ -1,19 +1,22 @@
-"use client";
+import Navbar from "@/components/ui/Navbar";
+import GalaxyBackground from "@/components/home/GalaxyBackground";
+import Hero from "@/components/home/Hero";
 
-import { motion } from "framer-motion";
 
 export default function Home(){
 
 return (
-<motion.div
-initial={{opacity:0,y:50}}
-animate={{opacity:1,y:0}}
-transition={{duration:1}}
->
-<h1>
-OmFood
-</h1>
-</motion.div>
+
+<main>
+
+<GalaxyBackground/>
+
+<Navbar/>
+
+<Hero/>
+
+</main>
+
 )
 
 }
