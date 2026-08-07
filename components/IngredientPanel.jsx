@@ -1,33 +1,7 @@
 "use client";
 
 
-const ingredients = [
-
-  {
-    name:"پنیر",
-    icon:"🧀",
-    price:30000
-  },
-
-  {
-    name:"قارچ",
-    icon:"🍄",
-    price:25000
-  },
-
-  {
-    name:"گوشت",
-    icon:"🥩",
-    price:70000
-  },
-
-  {
-    name:"زیتون",
-    icon:"🫒",
-    price:20000
-  }
-
-];
+import {ingredients} from "@/lib/ingredients";
 
 
 
@@ -41,160 +15,200 @@ setSelected
 
 
 
-  function toggle(item){
+function toggle(item){
 
 
-    const exists =
-      selected.find(
-        x=>x.name===item.name
-      );
+const exists =
 
+selected.find(
 
-    if(exists){
+x=>x.id===item.id
 
+);
 
-      setSelected(
 
-        selected.filter(
-          x=>x.name!==item.name
-        )
 
-      );
 
+if(exists){
 
-    }
 
-    else{
+setSelected(
 
+selected.filter(
 
-      setSelected([
-        ...selected,
-        item
-      ]);
+x=>x.id!==item.id
 
+)
 
-    }
+);
 
 
-  }
+}
 
+else{
 
 
+setSelected([
 
+...selected,
 
-  return (
+item
 
-    <div
+]);
 
-      className="
-      glass
-      rounded-3xl
-      p-6
-      "
 
-    >
+}
 
 
-      <h2
 
-        className="
-        text-2xl
-        font-bold
-        mb-6
-        "
+}
 
-      >
 
-        مواد اولیه
 
-      </h2>
 
 
 
-      <div
+return (
 
-        className="
-        grid
-        grid-cols-2
-        gap-4
-        "
+<div
 
-      >
+className="
+glass
+rounded-3xl
+p-6
+"
 
+>
 
-      {
 
-      ingredients.map(item=>(
+<h2
 
+className="
+text-2xl
+font-bold
+mb-6
+"
 
-        <button
+>
 
-          key={item.name}
+انتخاب مواد
 
-          onClick={()=>toggle(item)}
+</h2>
 
-          className={`
 
-          p-4
-          rounded-2xl
-          border
-          transition
 
-          ${
-          selected.some(
-            x=>x.name===item.name
-          )
 
-          ?
+<div
 
-          "bg-violet-600/40 border-violet-400"
+className="
+grid
+grid-cols-2
+gap-4
+"
 
-          :
+>
 
-          "bg-white/5 border-white/10"
 
-          }
+{
 
-          `}
+ingredients.map(item=>(
 
-        >
 
-          <div className="text-3xl">
+<button
 
-            {item.icon}
+key={item.id}
 
-          </div>
+onClick={()=>toggle(item)}
 
+className={`
 
-          <div>
+rounded-2xl
 
-            {item.name}
+p-4
 
-          </div>
+border
 
+transition
 
-          <small>
 
-            {item.price}
-            تومان
+${
 
-          </small>
+selected.some(
 
+x=>x.id===item.id
 
-        </button>
+)
 
+?
 
-      ))
+"bg-violet-600/40 border-violet-400"
 
-      }
+:
 
+"bg-white/5 border-white/10"
 
-      </div>
+}
 
+`}
 
-    </div>
+>
 
 
-  );
+<div
+
+className="
+text-4xl
+"
+
+>
+
+{item.icon}
+
+</div>
+
+
+
+<p>
+
+{item.name}
+
+</p>
+
+
+
+<span
+
+className="
+text-sm
+text-gray-400
+"
+
+>
+
+{item.price.toLocaleString()}
+
+تومان
+
+</span>
+
+
+
+</button>
+
+
+))
+
+
+}
+
+
+</div>
+
+
+</div>
+
+
+);
+
 
 }
