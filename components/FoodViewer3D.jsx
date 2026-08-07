@@ -1,54 +1,18 @@
 "use client";
 
 
-import { Canvas } from "@react-three/fiber";
+import {Canvas} from "@react-three/fiber";
+
 import {
-  OrbitControls,
-  Environment
+
+OrbitControls,
+
+Environment
+
 } from "@react-three/drei";
 
 
-
-function FoodModel(){
-
-
-  return (
-
-    <mesh
-
-      rotation={[
-        0,
-        Math.PI / 4,
-        0
-      ]}
-
-    >
-
-      <sphereGeometry
-        args={[
-          1.5,
-          64,
-          64
-        ]}
-      />
-
-
-      <meshStandardMaterial
-
-        color="#ff7b00"
-
-        metalness={0.2}
-
-        roughness={0.5}
-
-      />
-
-
-    </mesh>
-
-  );
-
-}
+import RealFoodModel from "./RealFoodModel";
 
 
 
@@ -57,73 +21,104 @@ export default function FoodViewer3D(){
 
 
 
-  return (
-
-    <div
-
-      className="
-      h-[500px]
-      rounded-[40px]
-      overflow-hidden
-      glass
-      "
-
-    >
+return (
 
 
-      <Canvas
+<div
 
-        camera={{
+className="
+h-[600px]
+glass
+rounded-[40px]
+overflow-hidden
+"
 
-          position:[
-            0,
-            2,
-            5
-          ]
-
-        }}
-
-      >
+>
 
 
-        <ambientLight
-          intensity={1}
-        />
+<Canvas
+
+camera={{
+
+position:[
+
+0,
+
+2,
+
+5
+
+]
+
+}}
+
+>
 
 
-        <directionalLight
+<ambientLight
 
-          position={[
-            5,
-            5,
-            5
-          ]}
+intensity={1.5}
 
-          intensity={2}
-
-        />
+/>
 
 
 
-        <FoodModel/>
+<directionalLight
+
+position={[
+
+5,
+
+5,
+
+5
+
+]}
+
+/>
 
 
 
-        <OrbitControls/>
+
+<RealFoodModel
+
+model="/models/pizza.glb"
+
+/>
 
 
 
-        <Environment preset="city"/>
+
+
+<OrbitControls
+
+enableZoom
+
+enablePan
+
+/>
 
 
 
-      </Canvas>
+
+
+<Environment
+
+preset="city"
+
+/>
 
 
 
-    </div>
+</Canvas>
 
 
-  );
+
+</div>
+
+
+
+);
+
 
 }
