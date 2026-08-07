@@ -1,216 +1,161 @@
 "use client";
 
-
-import {motion} from "framer-motion";
-import {
- Star,
- ShoppingCart
-} from "lucide-react";
-
+import { motion } from "framer-motion";
 
 
 export default function FoodCard({
+  title,
+  description,
+  image,
+  price,
+  onClick
+}) {
 
-food
 
-}){
+  return (
 
+    <motion.div
 
-return (
+      whileHover={{
+        y:-8,
+        scale:1.03
+      }}
 
+      whileTap={{
+        scale:.95
+      }}
 
-<motion.div
+      className="
+      overflow-hidden
+      rounded-3xl
+      bg-white/10
+      backdrop-blur-xl
+      border
+      border-white/20
+      text-white
+      cursor-pointer
+      "
+      
+      onClick={onClick}
 
+    >
 
-whileHover={{
 
-y:-10,
+      <div
+        className="
+        h-48
+        overflow-hidden
+        "
+      >
 
-scale:1.03
+        <img
 
-}}
+          src={image}
 
+          alt={title}
 
-className="
-glass
-rounded-3xl
-overflow-hidden
-"
+          className="
+          w-full
+          h-full
+          object-cover
+          hover:scale-110
+          transition
+          duration-500
+          "
 
+        />
 
->
+      </div>
 
 
 
-<div
 
-className="
-h-64
-overflow-hidden
-"
+      <div
+        className="
+        p-5
+        "
+      >
 
->
 
+        <h3
+          className="
+          text-2xl
+          font-bold
+          mb-2
+          "
+        >
+          {title}
+        </h3>
 
-<img
 
-src={food.image}
 
-alt={food.name}
+        <p
+          className="
+          text-gray-300
+          text-sm
+          mb-4
+          "
+        >
 
-className="
-w-full
-h-full
-object-cover
-hover:scale-110
-transition
-duration-500
-"
+          {description}
 
-/>
+        </p>
 
 
-</div>
 
 
+        <div
+          className="
+          flex
+          justify-between
+          items-center
+          "
+        >
 
+          <span
+            className="
+            text-yellow-300
+            font-bold
+            text-lg
+            "
+          >
 
-<div
+            {
+              price.toLocaleString()
+            }
 
-className="
-p-6
-"
+            {" "}
+            تومان
 
->
+          </span>
 
 
-<div
 
-className="
-flex
-justify-between
-"
+          <button
 
->
+            className="
+            px-4
+            py-2
+            rounded-xl
+            bg-purple-600
+            font-bold
+            "
+            
+          >
 
+            انتخاب
 
-<h3
+          </button>
 
-className="
-text-2xl
-font-bold
-"
 
->
+        </div>
 
-{food.name}
 
-</h3>
+      </div>
 
 
+    </motion.div>
 
-<div
-
-className="
-flex
-gap-1
-text-yellow-400
-"
-
->
-
-<Star
-size={18}
-fill="currentColor"
-/>
-
-
-{food.rating}
-
-
-</div>
-
-
-
-</div>
-
-
-
-
-<p
-
-className="
-text-gray-400
-mt-4
-"
-
->
-
-{food.description}
-
-</p>
-
-
-
-
-<div
-
-className="
-flex
-justify-between
-items-center
-mt-6
-"
-
->
-
-
-<span
-
-className="
-gradient-text
-font-black
-text-xl
-"
-
->
-
-{food.price.toLocaleString()}
-
- تومان
-
-</span>
-
-
-
-<button
-
-className="
-btn-primary
-flex
-gap-2
-items-center
-"
-
->
-
-<ShoppingCart size={18}/>
-
-سفارش
-
-</button>
-
-
-</div>
-
-
-</div>
-
-
-</motion.div>
-
-
-);
-
+  );
 
 }
