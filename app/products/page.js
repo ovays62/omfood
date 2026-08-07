@@ -3,7 +3,7 @@
 
 import { useState } from "react";
 
-import FoodCard from "@/components/FoodCard";
+import FoodCard from "../../components/FoodCard";
 
 import SearchBar from "@/components/SearchBar";
 
